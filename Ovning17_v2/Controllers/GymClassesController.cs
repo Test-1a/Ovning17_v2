@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +14,59 @@ namespace Ovning17_v2.Controllers
     public class GymClassesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public GymClassesController(ApplicationDbContext context)
+        public GymClassesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            this.userManager = userManager;
         }
 
         // GET: GymClasses
         public async Task<IActionResult> Index()
         {
             return View(await _context.GymClasses.ToListAsync());
+        }
+
+        public async Task<IActionResult> BookingToggle(int? id)
+        {
+            if (id == null) return NotFound();
+
+            //Hämta den inloggade användarens id
+            // var userId = _context.Users.FirstOrDefault(u => u.UserName == User.Identity.Name);
+            var userId = userManager.GetUserId(User);
+
+            //Hämta aktuellt gympass
+            var currentGymClass = await _context.GymClasses
+                .Include(a => a.AttendingMenbers)
+                .FirstOrDefaultAsync(g => g.Id == id);
+
+            //Är den aktuella inloggade användaren bokad på passet?
+            var attending = currentGymClass.AttendingMenbers
+                .FirstOrDefault(u => u.ApplicationUserId == userId);
+
+            //Om inte, boka användaren på passet
+            if(attending == null)
+            {
+                var booking = new ApplicationUserGymClass
+                {
+                    ApplicationUserId = userId,
+                    GymClassId = currentGymClass.Id
+                };
+
+                _context.ApplicationUserGymClasses.Add(booking);
+                _context.SaveChanges();
+            }
+
+            //Annars avboka
+            else
+            {
+                _context.ApplicationUserGymClasses.Remove(attending);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction(nameof(Index));
+
         }
 
         // GET: GymClasses/Details/5

@@ -15,6 +15,7 @@ namespace Ovning17_v2.Data
         }
 
         public DbSet<GymClass> GymClasses { get; set; }
+        public DbSet<ApplicationUserGymClass> ApplicationUserGymClasses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

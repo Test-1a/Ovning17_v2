@@ -25,7 +25,14 @@ namespace Ovning17_v2.Controllers
         // GET: GymClasses
         public async Task<IActionResult> Index()
         {
-            return View(await _context.GymClasses.ToListAsync());
+            //            return View(await _context.GymClasses.ToListAsync());
+
+            var model = await _context.GymClasses
+                .Include(g => g.AttendingMenbers)
+                .ThenInclude(a => a.ApplicationUser)
+                .ToListAsync();
+
+            return View(model);
         }
 
         public async Task<IActionResult> BookingToggle(int? id)

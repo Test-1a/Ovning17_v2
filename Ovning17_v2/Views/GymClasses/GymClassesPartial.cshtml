@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Ovning17_v2.Models.GymClass>
+
+@foreach (var item in Model)
+{
+    <tr>
+
+        <td>
+            <p>
+                @Html.DisplayFor(modelItem => item.Name)
+
+                <a data-toggle="collapse" href="#memberlist-@item.Id" role="button" aria-expanded="false">
+                    <i class="fa fa-plus"></i>
+                </a>
+            </p>
+            <div class="collapse" id="memberlist-@item.Id">
+                @foreach (var member in item.AttendingMenbers.Select(m => m.ApplicationUser))
+                {
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="card-title">@member.Email</h4>
+                            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor</p>
+                            <a href="#" class="btn btn-primary btn-sm"><i class="fa fa-info"></i></a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </td>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.StartDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Duration)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+            <a asp-action="BookingToggle" asp-route-id="@item.Id">Book</a>
+        </td>
+    </tr>
+}

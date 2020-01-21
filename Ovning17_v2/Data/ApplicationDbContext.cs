@@ -30,6 +30,7 @@ namespace Ovning17_v2.Data
                     k.GymClassId
                 });
 
+            builder.Entity<GymClass>().HasQueryFilter(g => g.StartDate > DateTime.Now);
         }
     }
 }

@@ -1,11 +1,12 @@
-﻿@model IEnumerable<Ovning17_v2.Models.GymClass>
+﻿@*@model IEnumerable<Ovning17_v2.Models.GymClass>*@
+@model Ovning17_v2.ViewModels.IndexViewModel
 @inject UserManager<ApplicationUser> userManager
 
 @{
     var userId = userManager.GetUserId(User);
 }
 
-@foreach (var gymClass in Model)
+@foreach (var gymClass in Model.GymClasses)
 {
     <tr>
 

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Ovning17_v2.Data;
 using Ovning17_v2.Models;
+using Ovning17_v2.ViewModels;
 
 namespace Ovning17_v2.Controllers
 {
@@ -26,16 +27,33 @@ namespace Ovning17_v2.Controllers
 
         // GET: GymClasses
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(IndexViewModel vm = null)
         {
             //            return View(await _context.GymClasses.ToListAsync());
 
-            var model = await _context.GymClasses
+            //Gamla GymKlasser
+            if (vm.History)
+            {
+                var gym = await _context.GymClasses
+                    .Include(g => g.AttendingMenbers)
+                    .ThenInclude(a => a.ApplicationUser)
+                    .IgnoreQueryFilters()
+                    .Where(g => g.StartDate < DateTime.Now)
+                    .ToListAsync();
+
+                var model = new IndexViewModel { GymClasses = gym };    //Populerar modellen
+                return View(model);
+            }
+
+            //GymKlasser i framtiden
+            var gymclasses = await _context.GymClasses
                 .Include(g => g.AttendingMenbers)
                 .ThenInclude(a => a.ApplicationUser)
                 .ToListAsync();
 
-            return View(model);
+            var model2 = new IndexViewModel { GymClasses = gymclasses };    //Populerar modellen
+
+            return View(model2);
         }
 
         [Authorize(Roles = "Member")]
@@ -57,7 +75,7 @@ namespace Ovning17_v2.Controllers
                 .FirstOrDefault(u => u.ApplicationUserId == userId);
 
             //Om inte, boka användaren på passet
-            if(attending == null)
+            if (attending == null)
             {
                 var booking = new ApplicationUserGymClass
                 {

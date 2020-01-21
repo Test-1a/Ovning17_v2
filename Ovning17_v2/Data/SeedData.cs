@@ -49,7 +49,7 @@ namespace Ovning17_v2.Data
                     if (foundUser != null) continue;
 
                     //Annars skapa user
-                    var user = new ApplicationUser { UserName = email, Email = email };
+                    var user = new ApplicationUser { UserName = email, Email = email, FirstName = "Admin", LastName = "Gym", TimeOfRegistration = DateTime.Now };
                     var addUserResult = await userManager.CreateAsync(user, adminPW);
 
                     if (!addUserResult.Succeeded)

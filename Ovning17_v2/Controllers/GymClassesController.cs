@@ -57,6 +57,22 @@ namespace Ovning17_v2.Controllers
         }
 
         [Authorize(Roles = "Member")]
+        public async Task<IActionResult> GetBookings()
+        {
+            var userId = userManager.GetUserId(User);
+
+            var model = await _context.ApplicationUserGymClasses
+                .Where(ag => ag.ApplicationUserId == userId)
+                .IgnoreQueryFilters()
+                .Select(ag => ag.GymClass)
+                .ToListAsync();
+
+            return View(model);
+
+        }
+
+
+        [Authorize(Roles = "Member")]
         public async Task<IActionResult> BookingToggle(int? id)
         {
             if (id == null) return NotFound();
@@ -67,6 +83,7 @@ namespace Ovning17_v2.Controllers
 
             //Hämta aktuellt gympass
             var currentGymClass = await _context.GymClasses
+                .IgnoreQueryFilters()
                 .Include(a => a.AttendingMenbers)
                 .FirstOrDefaultAsync(g => g.Id == id);
 
